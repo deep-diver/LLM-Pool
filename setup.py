@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name='llmpool',
-    version='0.0.5',
+    version='0.0.6',
     description="Large Language Models' pool management library",
     long_description=long_description,
     long_description_content_type='text/markdown',
