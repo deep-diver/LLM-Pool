@@ -20,6 +20,9 @@ def instantiate_model(name, model_spec):
     gen_config = model_spec['generation_config']
 
     model_type = eval(model_type)
+    load_config['model_cls'] = eval(load_config['model_cls'])
+    load_config['tokenizer_cls'] = eval(load_config['tokenizer_cls'])
+        
     model = model_type(
         name=name,
         **model_ckpt,
