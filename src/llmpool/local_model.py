@@ -11,9 +11,9 @@ class LocalLLModel(LLModel):
     def stream_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None):
         supert().stream_gen(prompts, gen_config, stopping_criteria)
 
-        model_inputs = _build_model_inputs(prompt)
-        streamer = _build_streamer()
-        gen_kwargs = _build_gen_kwargs(
+        model_inputs = self._build_model_inputs(prompt)
+        streamer = self._build_streamer()
+        gen_kwargs = self._build_gen_kwargs(
             model_inputs, gen_config, streamer, stopping_criteria
         )
 
