@@ -11,7 +11,7 @@ setup(
     long_description_content_type="text/markdown",
     author='chansung park',
     author_email='deep.diver.csp@gmail.com',
-    url='https://github.com/deep-diver/LLM-Pool',
+    url='https://github.com/deep-diver/LLM-Pool.git',
     install_requires=[],
     packages=['llmpool'],
     package_dir={'':'src'},
