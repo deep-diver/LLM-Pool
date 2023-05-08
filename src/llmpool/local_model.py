@@ -54,17 +54,17 @@ class LocalLLModel(LLModel):
             input_ids = encoding["input_ids"].to(self.device)
             generated_id = self.model.generate(
                 input_ids=input_ids,
-                generation_config=generation_config,
+                generation_config=gen_config,
             )
             decoded = self.tokenizer.batch_decode(
                 generated_id, skip_prompt=True, skip_special_tokens=True
             )
             return decoded
         else:
-            encodings = self.tokenizer(prompts, padding=True, return_tensors="pt").to(device)
+            encodings = self.tokenizer(prompts, padding=True, return_tensors="pt").to(self.device)
             generated_ids = self.model.generate(
                 **encodings,
-                generation_config=generation_config,
+                generation_config=gen_config,
             )
 
             decoded = self.tokenizer.batch_decode(
