@@ -3,6 +3,7 @@ from threading import Thread
 from peft import PeftModel
 from transformers import GenerationConfig
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import TextIteratorStreamer
 from optimum.bettertransformer import BetterTransformer
 
 from llmpool.model import LLModel
@@ -18,7 +19,7 @@ class LocalLLModel(LLModel):
         )
 
         t = Thread(target=self.model.generate, kwargs=gen_kwargs)
-        return thread, streamer
+        return t, streamer
 
     def _build_gen_kwargs(self, model_inputs, gen_config, streamer, stopping_criteria):
         gen_kwargs = dict(
@@ -29,11 +30,11 @@ class LocalLLModel(LLModel):
         gen_kwargs.update(gen_config.__dict__.copy())
         return gen_kwargs 
 
-    def _build_model_inputs(self, prompt, return_token_type_ids):
+    def _build_model_inputs(self, prompt, return_token_type_ids=False):
         model_inputs = self.tokenizer(
             [prompt], 
             return_tensors="pt",
-            return_token_type_ids=False
+            return_token_type_ids=return_token_type_ids
         ).to(self.device)
         return model_inputs
 
