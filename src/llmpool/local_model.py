@@ -98,7 +98,7 @@ class LocalLLModel(LLModel):
 
 class LocalLoRALLModel(LocalLLModel):
     def __init__(
-        self, name, base, ckpt, device='cuda',
+        self, name, base, lora, device='cuda',
         model_cls=AutoModel, tokenizer_cls=AutoTokenizer,
         load_in_8bit=True, apply_bettertransformer=False
     ):
@@ -107,6 +107,6 @@ class LocalLoRALLModel(LocalLLModel):
             load_in_8bit, apply_bettertransformer)
 
         self.model = PeftModel.from_pretrained(
-            self.model, ckpt, 
+            self.model, lora, 
             device_map={'': 0}
         )

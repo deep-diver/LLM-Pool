@@ -1,0 +1,47 @@
+alpaca-lora-13b:
+  type: llmpool.LocalLoRALLModel
+  metadata:
+    thumbnail: https://...
+    thumbnail-xs: https://...
+  model:
+    base: elinas/llama-13b-hf-transformers-4.29
+    lora: LLMs/Vicuna-LoRA-EvolInstruct-13B
+  load:
+    model_cls: transformers.AutoModelForCausalLM
+    tokenizer_cls: transformers.AutoTokenizer
+    device: cuda
+    load_in_8bit: true
+    apply_bettertransformer: false      
+  generation_config:
+    temperature: 0.95
+    top_p: 0.9
+    top_k: 50
+    num_beams: 1
+    use_cache: True
+    repetition_penalty: 1.2
+    max_new_tokens: 1024
+    do_sample: True
+    
+vicuna-lora-evolinstruct-13b:
+  type: llmpool.LocalLoRALLModel
+  metadata:
+    thumbnail: https://...
+    thumbnail-xs: https://...
+  model:
+    base: elinas/llama-13b-hf-transformers-4.29
+    lora: LLMs/Vicuna-LoRA-EvolInstruct-13B
+  load:
+    model_cls: transformers.AutoModelForCausalLM
+    tokenizer_cls: transformers.AutoTokenizer
+    device: cuda
+    load_in_8bit: true
+    apply_bettertransformer: false      
+  generation_config:
+    temperature: 0.95
+    top_p: 0.9
+    top_k: 50
+    num_beams: 1
+    use_cache: True
+    repetition_penalty: 1.2
+    max_new_tokens: 1024
+    do_sample: True
