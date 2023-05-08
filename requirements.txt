@@ -3,3 +3,4 @@ optimum
 peft
 text_generation
 accelerate
+bitsandbytes
