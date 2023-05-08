@@ -7,44 +7,6 @@ from optimum.bettertransformer import BetterTransformer
 
 from llmpool.model import LLModel
 
-class LocalLoRACausalLLModel(LocalCausalLLModel):
-    def __init__(
-        self, name, base, device='cuda', 
-        load_in_8bit=True, apply_bettertransformer=False
-    ):
-        super().__init__(
-            name, base, device, load_in_8bit, 
-            apply_bettertransformer=apply_bettertransformer)
-
-        self.model = PeftModel.from_pretrained(
-            self.model, ckpt, 
-            device_map={'': 0}
-        )
-
-class LocalCausalLLModel(LocalLLModel):
-    def __init__(
-        self, name, base, device='cuda', 
-        load_in_8bit=True, apply_bettertransformer=False
-    ):
-        super().__init__(name)
-
-        self.device = device
-        self.tokenizer = AutoTokenizer.from_pretrained(base)
-        self.tokenizer.pad_token_id = 0
-        self.tokenizer.padding_side = "left"
-
-        self.model = AutoModelForCausalLM.from_pretrained(
-            base,
-            load_in_8bit=load_in_8bit,
-            device_map="auto",
-        )
-        
-        if apply_bettertransformer:
-            self.model = BetterTransformer.transform(self.model)
-
-        if multi_gpu:
-            self.model.half()
-
 class LocalLLModel(LLModel):
     def stream_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None):
         supert().stream_gen(prompts, gen_config, stopping_criteria)
@@ -111,3 +73,41 @@ class LocalLLModel(LLModel):
             del encodings, generated_ids
             torch.cuda.empty_cache()
             return decoded              
+
+class LocalCausalLLModel(LocalLLModel):
+    def __init__(
+        self, name, base, device='cuda', 
+        load_in_8bit=True, apply_bettertransformer=False
+    ):
+        super().__init__(name)
+
+        self.device = device
+        self.tokenizer = AutoTokenizer.from_pretrained(base)
+        self.tokenizer.pad_token_id = 0
+        self.tokenizer.padding_side = "left"
+
+        self.model = AutoModelForCausalLM.from_pretrained(
+            base,
+            load_in_8bit=load_in_8bit,
+            device_map="auto",
+        )
+        
+        if apply_bettertransformer:
+            self.model = BetterTransformer.transform(self.model)
+
+        if multi_gpu:
+            self.model.half()
+
+class LocalLoRACausalLLModel(LocalCausalLLModel):
+    def __init__(
+        self, name, base, device='cuda', 
+        load_in_8bit=True, apply_bettertransformer=False
+    ):
+        super().__init__(
+            name, base, device, load_in_8bit, 
+            apply_bettertransformer=apply_bettertransformer)
+
+        self.model = PeftModel.from_pretrained(
+            self.model, ckpt, 
+            device_map={'': 0}
+        )
