@@ -5,13 +5,15 @@ from llmpool.model import LLModel
 
 class TextGenInferenceLLModel(LLModel):
     def __init__(self, name, url, headers=None, cookies=None, timeout=10):
-        super.__init__(name)
+        super().__init__(name)
 
         self.client = Client(
             base_url=url, headers=headers, cookies=cookies, timeout=timeout
         )
 
     def stream_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None):
+        super().stream_gen(prompts, gen_config, stopping_criteria)
+
         stream = client.generate_stream(
             prompts,
             do_sample=gen_config.do_sample,
@@ -31,6 +33,8 @@ class TextGenInferenceLLModel(LLModel):
         return None, stream
 
     def batch_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None, best_of=None):
+        super().batch_gen(prompts, gen_config, stopping_criteria)
+
         batch = client.generate(
             prompts,
             do_sample=gen_config.do_sample,

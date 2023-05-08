@@ -47,7 +47,7 @@ class LocalLLModel(LLModel):
         return streamer
 
     def batch_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None):
-        super.batch_gen(prompts, gen_config)
+        super().batch_gen(prompts, gen_config, stopping_criteria)
 
         if len(prompts) == 1:
             encoding = tokenizer(prompts, return_tensors="pt")
@@ -83,9 +83,6 @@ class LocalCausalLLModel(LocalLLModel):
 
         self.device = device
         self.tokenizer = AutoTokenizer.from_pretrained(base)
-        self.tokenizer.pad_token_id = 0
-        self.tokenizer.padding_side = "left"
-
         self.model = AutoModelForCausalLM.from_pretrained(
             base,
             load_in_8bit=load_in_8bit,
