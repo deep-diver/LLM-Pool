@@ -2,13 +2,33 @@ from threading import Thread
 
 from peft import PeftModel
 from transformers import GenerationConfig
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModel, AutoTokenizer
 from transformers import TextIteratorStreamer
 from optimum.bettertransformer import BetterTransformer
 
 from llmpool.model import LLModel
 
 class LocalLLModel(LLModel):
+    def __init__(
+        self, name, base, device='cuda', 
+        load_in_8bit=True, apply_bettertransformer=False
+    ):
+        super().__init__(name)
+
+        self.device = device
+        self.tokenizer = AutoTokenizer.from_pretrained(base)
+        self.model = AutoModel.from_pretrained(
+            base,
+            load_in_8bit=load_in_8bit,
+            device_map="auto",
+        )
+        
+        if apply_bettertransformer:
+            self.model = BetterTransformer.transform(self.model)
+
+        if not load_in_8bit:
+            self.model.half()
+
     def stream_gen(self, prompt, gen_config: GenerationConfig, stopping_criteria=None, start=True):
         super().stream_gen(prompt, gen_config, stopping_criteria)
 
@@ -75,28 +95,7 @@ class LocalLLModel(LLModel):
             )
             return decoded              
 
-class LocalCausalLLModel(LocalLLModel):
-    def __init__(
-        self, name, base, device='cuda', 
-        load_in_8bit=True, apply_bettertransformer=False
-    ):
-        super().__init__(name)
-
-        self.device = device
-        self.tokenizer = AutoTokenizer.from_pretrained(base)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            base,
-            load_in_8bit=load_in_8bit,
-            device_map="auto",
-        )
-        
-        if apply_bettertransformer:
-            self.model = BetterTransformer.transform(self.model)
-
-        if not load_in_8bit:
-            self.model.half()
-
-class LocalLoRACausalLLModel(LocalCausalLLModel):
+class LocalLoRALLModel(LocalLLModel):
     def __init__(
         self, name, base, ckpt, device='cuda', 
         load_in_8bit=True, apply_bettertransformer=False
