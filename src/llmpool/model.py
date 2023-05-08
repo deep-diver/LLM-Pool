@@ -5,8 +5,8 @@ class LLModel:
         self.name = name
         pass
 
-    def stream_gen(self, gen_config: GenerationConfig):
+    def stream_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None):
         pass
 
-    def batch_gen(self, gen_config: GenerationConfig):
+    def batch_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None):
         pass

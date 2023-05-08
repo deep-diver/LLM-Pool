@@ -3,13 +3,13 @@ from peft import PeftModel
 from transformers import LlamaTokenizer, LlamaForCausalLM
 from optimum.bettertransformer import BetterTransformer
 
-from llmpool.model import LLModel
-from transformers import GenerationConfig
+from llmpool.local_model import LocalLLModel
 
-class LocalAlpaca(LLModel):
-    def __init__(self, name, base):
+class LocalAlpaca(LocalLLModel):
+    def __init__(self, name, base, device='cuda'):
         super().__init__(name)
 
+        self.device = device
         self.tokenizer = LlamaTokenizer.from_pretrained(base)
         self.tokenizer.pad_token_id = 0
         self.tokenizer.padding_side = "left"
@@ -22,18 +22,11 @@ class LocalAlpaca(LLModel):
         
         if multi_gpu:
             self.model.half()
-        # model = BetterTransformer.transform(model)
-
-    def stream_gen(self, gen_config: GenerationConfig):
-        pass
-
-    def batch_gen(self, gen_config: GenerationConfig):
-        pass
-    
+        # model = BetterTransformer.transform(model)                  
 
 class LocalAlpacaLoRA(LocalAlpaca):
-    def __init__(self, name, base, ckpt):
-        super().__init__(name, base)
+    def __init__(self, name, base, device='cuda'):
+        super().__init__(name, base, device)
 
         self.model = PeftModel.from_pretrained(
             self.model, ckpt, 
