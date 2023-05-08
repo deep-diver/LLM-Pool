@@ -50,28 +50,26 @@ class LocalLLModel(LLModel):
         super().batch_gen(prompts, gen_config, stopping_criteria)
 
         if len(prompts) == 1:
-            encoding = tokenizer(prompts, return_tensors="pt")
+            encoding = self.tokenizer(prompts, return_tensors="pt")
             input_ids = encoding["input_ids"].to(self.device)
-            generated_id = model.generate(
+            generated_id = self.model.generate(
                 input_ids=input_ids,
                 generation_config=generation_config,
             )
-            decoded = tokenizer.batch_decode(
+            decoded = self.tokenizer.batch_decode(
                 generated_id, skip_prompt=True, skip_special_tokens=True
             )
             return decoded
         else:
-            encodings = tokenizer(prompts, padding=True, return_tensors="pt").to(device)
-            generated_ids = model.generate(
+            encodings = self.tokenizer(prompts, padding=True, return_tensors="pt").to(device)
+            generated_ids = self.model.generate(
                 **encodings,
                 generation_config=generation_config,
             )
 
-            decoded = tokenizer.batch_decode(
+            decoded = self.tokenizer.batch_decode(
                 generated_ids, skip_prompt=True, skip_special_tokens=True
             )
-            del encodings, generated_ids
-            torch.cuda.empty_cache()
             return decoded              
 
 class LocalCausalLLModel(LocalLLModel):
