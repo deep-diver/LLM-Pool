@@ -100,7 +100,7 @@ class LocalCausalLLModel(LocalLLModel):
 
 class LocalLoRACausalLLModel(LocalCausalLLModel):
     def __init__(
-        self, name, base, device='cuda', 
+        self, name, base, ckpt, device='cuda', 
         load_in_8bit=True, apply_bettertransformer=False
     ):
         super().__init__(
