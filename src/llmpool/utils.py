@@ -3,6 +3,7 @@ import llmpool
 import transformers
 
 from llmpool import LLModelPool
+from llmpool import LocalLLModel, LocalLoRALLModel
 
 def load_yaml(filepath):
     yaml_dict = None
@@ -15,14 +16,26 @@ def load_yaml(filepath):
 def instantiate_model(name, model_spec):
     model_type = model_spec['type']
     metadata = model_spec['metadata']
-    model_ckpt = model_spec['model']
-    load_config = model_spec['load']
     gen_config = model_spec['generation_config']
 
+    model_ckpt = {}
+    load_config = {}
+
     model_type = eval(model_type)
-    load_config['model_cls'] = eval(load_config['model_cls'])
-    load_config['tokenizer_cls'] = eval(load_config['tokenizer_cls'])
-        
+    if isinstance(model_type, LocalLLModel) \
+        or isinstance(model_type, LocalLoRALLModel):
+        assert "model" in model_spec, "model ckpt config should be provided"
+        model_ckpt = model_spec['model']
+
+        if 'load' in model_spec:
+            load_config = model_spec['load']
+
+    if "model_cls" in load_config:
+        load_config['model_cls'] = eval(load_config['model_cls'])
+
+    if "tokenizer_cls" in load_config:
+        load_config['tokenizer_cls'] = eval(load_config['tokenizer_cls'])
+
     model = model_type(
         name=name,
         **model_ckpt,
