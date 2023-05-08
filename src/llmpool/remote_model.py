@@ -11,11 +11,11 @@ class TextGenInferenceLLModel(LLModel):
             base_url=url, headers=headers, cookies=cookies, timeout=timeout
         )
 
-    def stream_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None):
-        super().stream_gen(prompts, gen_config, stopping_criteria)
+    def stream_gen(self, prompt, gen_config: GenerationConfig, stopping_criteria=None):
+        super().stream_gen(prompt, gen_config, stopping_criteria)
 
         stream = client.generate_stream(
-            prompts,
+            prompt,
             do_sample=gen_config.do_sample,
             max_new_tokens=gen_config.max_new_tokens,
             repetition_penalty=gen_config.repetition_penalty,

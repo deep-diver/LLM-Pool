@@ -8,8 +8,8 @@ from optimum.bettertransformer import BetterTransformer
 from llmpool.model import LLModel
 
 class LocalLLModel(LLModel):
-    def stream_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None):
-        super().stream_gen(prompts, gen_config, stopping_criteria)
+    def stream_gen(self, prompt, gen_config: GenerationConfig, stopping_criteria=None):
+        super().stream_gen(prompt, gen_config, stopping_criteria)
 
         model_inputs = self._build_model_inputs(prompt)
         streamer = self._build_streamer()
