@@ -95,7 +95,7 @@ class LocalCausalLLModel(LocalLLModel):
         if apply_bettertransformer:
             self.model = BetterTransformer.transform(self.model)
 
-        if multi_gpu:
+        if not load_in_8bit:
             self.model.half()
 
 class LocalLoRACausalLLModel(LocalCausalLLModel):
