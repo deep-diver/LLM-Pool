@@ -10,14 +10,15 @@ from llmpool.model import LLModel
 
 class LocalLLModel(LLModel):
     def __init__(
-        self, name, base, device='cuda', 
+        self, name, base, device='cuda',
+        model_cls=AutoModel, tokenizer_cls=AutoTokenizer,
         load_in_8bit=True, apply_bettertransformer=False
     ):
         super().__init__(name)
 
         self.device = device
-        self.tokenizer = AutoTokenizer.from_pretrained(base)
-        self.model = AutoModel.from_pretrained(
+        self.tokenizer = tokenizer_cls.from_pretrained(base)
+        self.model = model_cls.from_pretrained(
             base,
             load_in_8bit=load_in_8bit,
             device_map="auto",
