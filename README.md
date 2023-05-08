@@ -42,3 +42,7 @@ for model in model_pool:
     print(text, end='')
 
 ```
+
+## Todo
+- [ ] Add example notebooks
+- [ ] Yaml parser to add models to model pool
