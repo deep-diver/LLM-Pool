@@ -103,9 +103,8 @@ class LocalLoRALLModel(LocalLLModel):
         load_in_8bit=True, apply_bettertransformer=False
     ):
         super().__init__(
-            name, base, device, load_in_8bit, 
-            model_cls=model_cls, tokenizer_cls=tokenizer_cls,
-            apply_bettertransformer=apply_bettertransformer)
+            name, base, device, model_cls, tokenizer_cls,
+            load_in_8bit, apply_bettertransformer)
 
         self.model = PeftModel.from_pretrained(
             self.model, ckpt, 
