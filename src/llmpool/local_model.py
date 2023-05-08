@@ -9,7 +9,7 @@ from optimum.bettertransformer import BetterTransformer
 from llmpool.model import LLModel
 
 class LocalLLModel(LLModel):
-    def stream_gen(self, prompt, gen_config: GenerationConfig, stopping_criteria=None):
+    def stream_gen(self, prompt, gen_config: GenerationConfig, stopping_criteria=None, start=True):
         super().stream_gen(prompt, gen_config, stopping_criteria)
 
         model_inputs = self._build_model_inputs(prompt)
@@ -19,6 +19,8 @@ class LocalLLModel(LLModel):
         )
 
         t = Thread(target=self.model.generate, kwargs=gen_kwargs)
+        if start:
+            t.start()
         return t, streamer
 
     def _build_gen_kwargs(self, model_inputs, gen_config, streamer, stopping_criteria):
