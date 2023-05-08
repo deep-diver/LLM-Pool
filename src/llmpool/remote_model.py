@@ -14,7 +14,7 @@ class TextGenInferenceLLModel(LLModel):
     def stream_gen(self, prompt, gen_config: GenerationConfig, stopping_criteria=None):
         super().stream_gen(prompt, gen_config, stopping_criteria)
 
-        stream = client.generate_stream(
+        stream = self.client.generate_stream(
             prompt,
             do_sample=gen_config.do_sample,
             max_new_tokens=gen_config.max_new_tokens,
@@ -35,7 +35,7 @@ class TextGenInferenceLLModel(LLModel):
     def batch_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None, best_of=None):
         super().batch_gen(prompts, gen_config, stopping_criteria)
 
-        batch = client.generate(
+        batch = self.client.generate(
             prompts,
             do_sample=gen_config.do_sample,
             max_new_tokens=gen_config.max_new_tokens,
