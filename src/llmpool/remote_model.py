@@ -3,7 +3,7 @@ from transformers import GenerationConfig
 
 from llmpool.model import LLModel
 
-class TextGenInferenceLLModel(LLModel):
+class TxtGenIfLLModel(LLModel):
     def __init__(self, name, url, headers=None, cookies=None, timeout=10):
         super().__init__(name)
 
