@@ -1,0 +1,4 @@
+transformers
+optimum
+peft
+text_generation

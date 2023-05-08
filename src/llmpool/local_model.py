@@ -1,7 +1,49 @@
 from threading import Thread
+
+from peft import PeftModel
 from transformers import GenerationConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from optimum.bettertransformer import BetterTransformer
 
 from llmpool.model import LLModel
+
+class LocalLoRACausalLLModel(LocalCausalLLModel):
+    def __init__(
+        self, name, base, device='cuda', 
+        load_in_8bit=True, apply_bettertransformer=False
+    ):
+        super().__init__(
+            name, base, device, load_in_8bit, 
+            apply_bettertransformer=apply_bettertransformer)
+
+        self.model = PeftModel.from_pretrained(
+            self.model, ckpt, 
+            device_map={'': 0}
+        )
+
+class LocalCausalLLModel(LocalLLModel):
+    def __init__(
+        self, name, base, device='cuda', 
+        load_in_8bit=True, apply_bettertransformer=False
+    ):
+        super().__init__(name)
+
+        self.device = device
+        self.tokenizer = AutoTokenizer.from_pretrained(base)
+        self.tokenizer.pad_token_id = 0
+        self.tokenizer.padding_side = "left"
+
+        self.model = AutoModelForCausalLM.from_pretrained(
+            base,
+            load_in_8bit=load_in_8bit,
+            device_map="auto",
+        )
+        
+        if apply_bettertransformer:
+            self.model = BetterTransformer.transform(self.model)
+
+        if multi_gpu:
+            self.model.half()
 
 class LocalLLModel(LLModel):
     def stream_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None):
@@ -16,7 +58,7 @@ class LocalLLModel(LLModel):
         t = Thread(target=self.model.generate, kwargs=gen_kwargs)
         return thread, streamer
 
-    def _build_gen_kwargs(model_inputs, gen_config, streamer, stopping_criteria):
+    def _build_gen_kwargs(self, model_inputs, gen_config, streamer, stopping_criteria):
         gen_kwargs = dict(
             model_inputs,
             streamer=streamer,
@@ -25,7 +67,7 @@ class LocalLLModel(LLModel):
         gen_kwargs.update(gen_config.__dict__.copy())
         return gen_kwargs 
 
-    def _build_model_inputs(prompt, return_token_type_ids):
+    def _build_model_inputs(self, prompt, return_token_type_ids):
         model_inputs = self.tokenizer(
             [prompt], 
             return_tensors="pt",
@@ -33,11 +75,7 @@ class LocalLLModel(LLModel):
         ).to(self.device)
         return model_inputs
 
-    def _build_streamer(
-        timeout=20.,
-        skip_prompt=True,
-        skip_special_tokens=True
-    ):
+    def _build_streamer(self, timeout=20., skip_prompt=True, skip_special_tokens=True):
         streamer = TextIteratorStreamer(
             self.tokenizer,
             timeout=timeout, 
