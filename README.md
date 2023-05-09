@@ -5,7 +5,7 @@ This simple project is to manage multiple LLM(Large Language Model)s in one plac
 - compare generated text from different models side by side
 - complete conversation in collaboration of different models
 
-![](https://i.ibb.co/my2tf27/overview.png)
+![](https://i.ibb.co/GH55nWs/2023-05-09-12-09-58.png)
 
 ## Usecase
 
