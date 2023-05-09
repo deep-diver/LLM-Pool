@@ -52,6 +52,6 @@ class TxtGenIfLLModel(LLModel):
             watermark=False,
         )
 
-        return batch
+        return batch.generated_text
 
     

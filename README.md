@@ -1,5 +1,10 @@
 # LLM-Pool
 
+This simple project is to manage multiple LLM(Large Language Model)s in one place. Because there are too many fine-tuned LLMs, and it is hard to evaluate which one is bettern than others, it might be useful to test as many models as possible. Below is the two useful usecases that I had in mind when kicking off this project.
+
+- compare generated text from different models side by side
+- complete conversation in collaboration of different models
+
 ![](https://i.ibb.co/my2tf27/overview.png)
 
 ## Usecase
@@ -13,7 +18,7 @@ from llmpool import RemoteTxtGenIfLLModel
 from transformers import AutoModelForCausalLM
 
 model_pool = LLModelPool()
-model_pool.add_model(
+model_pool.add_models(
   # alpaca-lora 13b
   LocalLoRALLModel(
     "alpaca-lora-13b",
@@ -24,25 +29,39 @@ model_pool.add_model(
   
   RemoteTxtGenIfLLModel(
     "stable-vicuna-13b",
-    "API_URL"
-  )
+    "https://...:8080"
+  ),
 )
 
 for model in model_pool:
-  batch_result = model.batch_gen(
+  result = model.batch_gen(
     ["hello world"], 
     GenerationConfig(...)
   )
+  print(result)
   
   _, stream_result = model.stream_gen(
     "hello world",
     GenerationConfig(...)
   )
-  for text in stream_result:
-    print(text, end='')
 
+  for ret in stream_results:
+    if instanceof(model, LocalLoRALLModel) or \
+      instanceof(model, LocalLLModel):
+      print(ret, end='')
+    else:
+      print(ret.token.text, end='')
+
+```
+
+Alternatively, you can organize the model pool with yaml file
+
+```python
+from llmpool import instantiate_models
+
+model_pool = instantiate_models('...yaml')
 ```
 
 ## Todo
 - [ ] Add example notebooks
-- [ ] Yaml parser to add models to model pool
+- [X] Yaml parser to add models to model pool
