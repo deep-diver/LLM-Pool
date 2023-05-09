@@ -10,13 +10,14 @@ class LLModelMetadata:
         self.thumb_xs_path = thumb_xs_path
 
 class LLModel:
-    def __init__(self, name, metadata: LLModelMetadata=None):
+    def __init__(self, name, gen_config: GenerationConfig, metadata: LLModelMetadata=None):
         self.name = name
         self.metadata = metadata
+        self.gen_config = gen_config
         pass
 
-    def stream_gen(self, prompt, gen_config: GenerationConfig, stopping_criteria=None):
+    def stream_gen(self, prompt, gen_config: GenerationConfig=None, stopping_criteria=None):
         pass
 
-    def batch_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None):
+    def batch_gen(self, prompts, gen_config: GenerationConfig=None, stopping_criteria=None):
         pass

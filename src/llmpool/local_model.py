@@ -10,11 +10,11 @@ from llmpool.model import LLModel
 
 class LocalLLModel(LLModel):
     def __init__(
-        self, name, base, device='cuda',
+        self, name, gen_config, base, device='cuda',
         model_cls=AutoModel, tokenizer_cls=AutoTokenizer,
         load_in_8bit=True, apply_bettertransformer=False
     ):
-        super().__init__(name)
+        super().__init__(name, gen_config)
 
         self.device = device
         self.tokenizer = tokenizer_cls.from_pretrained(base)
@@ -30,8 +30,11 @@ class LocalLLModel(LLModel):
         if not load_in_8bit:
             self.model.half()
 
-    def stream_gen(self, prompt, gen_config: GenerationConfig, stopping_criteria=None, start=True):
+    def stream_gen(self, prompt, gen_config: GenerationConfig=None, stopping_criteria=None, start=True):
         super().stream_gen(prompt, gen_config, stopping_criteria)
+
+        if gen_config is None:
+            gen_config = self.gen_config
 
         model_inputs = self._build_model_inputs(prompt)
         streamer = self._build_streamer()
@@ -70,8 +73,11 @@ class LocalLLModel(LLModel):
         )
         return streamer
 
-    def batch_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None):
+    def batch_gen(self, prompts, gen_config: GenerationConfig=None, stopping_criteria=None):
         super().batch_gen(prompts, gen_config, stopping_criteria)
+
+        if gen_config is None:
+            gen_config = self.gen_config
 
         if len(prompts) == 1:
             encoding = self.tokenizer(prompts, return_tensors="pt")
@@ -98,12 +104,13 @@ class LocalLLModel(LLModel):
 
 class LocalLoRALLModel(LocalLLModel):
     def __init__(
-        self, name, base, lora, device='cuda',
+        self, name, gen_config, base, lora, device='cuda',
         model_cls=AutoModel, tokenizer_cls=AutoTokenizer,
         load_in_8bit=True, apply_bettertransformer=False
     ):
         super().__init__(
-            name, base, device, model_cls, tokenizer_cls,
+            name, gen_config, base, 
+            device, model_cls, tokenizer_cls,
             load_in_8bit, apply_bettertransformer)
 
         self.model = PeftModel.from_pretrained(

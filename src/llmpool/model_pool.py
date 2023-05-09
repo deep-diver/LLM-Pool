@@ -1,8 +1,11 @@
 import yaml
 from typing import List
+
+from transformers import GenerationConfig
+
+import llmpool
 from llmpool.model import LLModel
-from llmpool.local_model import LocalLLModel, LocalLoRALLModel
-from llmpool.remote_model import TxtGenIfLLModel
+from llmpool.local_model import LocalLLModel
 
 class LLModelIter:
     def __init__(self, model_pool):
@@ -35,20 +38,32 @@ class LLModelPool:
     def get_model(self, name) -> LLModel:
         return self.models[name]
 
+    def __iter__(self):
+        return LLModelIter(self)
+    
+    @classmethod
+    def get_default_gen_config(cls):
+        return {
+            "top_k": 50,
+            "top_p": 0.95,
+            "max_new_tokens": 128,
+            "penalty_p": 0.5
+        }
 
     @classmethod
     def instantiate_model(cls, name, model_spec):
         model_type = model_spec['type']
         load_config = model_spec['load']
         metadata = model_spec['metadata']
-        gen_config = model_spec['generation_config']
 
         model_ckpt = {}
-        load_config = {}
+        if 'generation_config' in model_spec:
+            gen_config = cls.get_default_gen_config()
+        else:
+            gen_config = model_spec['generation_config']        
 
         model_type = eval(model_type)
-        if isinstance(model_type, LocalLLModel) \
-            or isinstance(model_type, LocalLoRALLModel):
+        if isinstance(model_type, LocalLLModel):
             assert "model" in model_spec, "model ckpt config should be provided"
             model_ckpt = model_spec['model']
 
@@ -60,6 +75,9 @@ class LLModelPool:
 
         model = model_type(
             name=name,
+            gen_config=GenerationConfig(
+                **gen_config
+            ),
             **model_ckpt,
             **load_config
         )
@@ -87,6 +105,3 @@ class LLModelPool:
             yaml_dict = yaml.load(file, Loader=yaml.FullLoader)
 
         return yaml_dict
-
-    def __iter__(self):
-        return LLModelIter(self)
