@@ -4,12 +4,19 @@ from transformers import GenerationConfig
 from llmpool.model import LLModel
 
 class TxtGenIfLLModel(LLModel):
-    def __init__(self, name, url, headers=None, cookies=None, timeout=10):
+    def __init__(self, name, url, port, headers=None, cookies=None, timeout=10):
         super().__init__(name)
 
+        if port is not None:
+            port = f":{port}"
+
         self.client = Client(
-            base_url=url, headers=headers, cookies=cookies, timeout=timeout
+            base_url=f"{url}{port}", headers=headers, cookies=cookies, timeout=timeout
         )
+
+    def _stream_text(self, stream_results):
+        for stream_result in stream_results:
+            yield stream_result.token.text
 
     def stream_gen(self, prompt, gen_config: GenerationConfig, stopping_criteria=None):
         super().stream_gen(prompt, gen_config, stopping_criteria)
@@ -30,7 +37,7 @@ class TxtGenIfLLModel(LLModel):
             watermark=False,
         )
 
-        return None, stream
+        return None, self._stream_text(stream)
 
     def batch_gen(self, prompts, gen_config: GenerationConfig, stopping_criteria=None, best_of=None):
         super().batch_gen(prompts, gen_config, stopping_criteria)

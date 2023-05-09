@@ -45,3 +45,22 @@ vicuna-lora-evolinstruct-13b:
     repetition_penalty: 1.2
     max_new_tokens: 1024
     do_sample: True
+
+stable-vicuna-13b:
+  type: llmpool.TxtGenIfLLModel
+  metadata:
+    thumbnail: https://...
+    thumbnail-xs: https://...
+  load:
+    url: http://127.0.0.1
+    port: 8080 
+    timeout: 10.0
+  generation_config:
+    temperature: 0.95
+    top_p: 0.9
+    top_k: 50
+    num_beams: 1
+    use_cache: True
+    repetition_penalty: 1.2
+    max_new_tokens: 1024
+    do_sample: True
