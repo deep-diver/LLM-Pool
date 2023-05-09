@@ -1,4 +1,4 @@
-__version__ = '0.1.5'
+__version__ = '0.2.0'
 
 from .local_model import LocalLLModel, LocalLoRALLModel
 from .model_pool import LLModelPool
